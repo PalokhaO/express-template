@@ -1,18 +1,33 @@
-import express from 'express';
+import { json } from 'body-parser';
+import cookieParser from 'cookie-parser';
 import cors from 'cors';
-import { connectToDb } from './typeorm';
+import express from 'express';
 import { router } from './router';
-
-const PORT = 5000;
+import { connectToDb } from './typeorm';
+import { join } from 'path';
 
 const app = express();
-app.use(cors());
+app.use(cors({
+    credentials: true,
+    origin: true,
+}));
+app.use(json({
+    type: ['text/plain', 'application/json'],
+}));
+app.use(cookieParser());
 app.use(router);
 
-async function start() {
-    // await connectToDb();
+// Serve static folder
 
-    app.listen(PORT);
+// app.use(express.static(join(__dirname, './static')));
+// app.get('*', (req, res) =>{
+//     res.sendFile(join(__dirname, './static/index.html'));
+// });
+
+async function start() {
+    await connectToDb();
+
+    app.listen(process.env.PORT);
     console.log('App started successfully');
 }
 
